@@ -1,8 +1,5 @@
 name: Deploy to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+
 on:
   push:
     branches: [ main, master ]
@@ -14,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      pages: write
       id-token: write
     steps:
       - uses: actions/checkout@v3
