@@ -1528,3 +1528,12 @@ function initAnalytics() {
         });
     });
 }
+
+// Initialize all features when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initModals();
+    initAudioPlayback();
+    initStickyNotes();
+    initSmoothScrolling();
+    initAnalytics();
+});
