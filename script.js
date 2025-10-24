@@ -1529,11 +1529,86 @@ function initAnalytics() {
     });
 }
 
-// Initialize all features when the page loads
-document.addEventListener('DOMContentLoaded', function() {
-    initModals();
-    initAudioPlayback();
-    initStickyNotes();
-    initSmoothScrolling();
-    initAnalytics();
+// 添加全局错误处理
+window.addEventListener('error', function(error) {
+    console.error('全局错误:', error.message, '在文件:', error.filename, '行号:', error.lineno);
 });
+
+window.addEventListener('unhandledrejection', function(event) {
+    console.error('未处理的Promise错误:', event.reason);
+});
+
+// 初始化函数，带错误处理
+function safeInit() {
+    console.log('开始初始化网站功能...');
+    
+    try {
+        // 检查DOM元素是否存在
+        const addMoreWordsBtn = document.getElementById('addMoreWords');
+        const addMoreSentencesBtn = document.getElementById('addMoreSentences');
+        
+        console.log('按钮元素检查:', { addMoreWordsBtn: !!addMoreWordsBtn, addMoreSentencesBtn: !!addMoreSentencesBtn });
+        
+        // 初始化各个功能模块
+        try {
+            initModals();
+            console.log('模态框功能初始化成功');
+        } catch (err) {
+            console.error('模态框初始化失败:', err);
+        }
+        
+        try {
+            initAudioPlayback();
+            console.log('音频播放功能初始化成功');
+        } catch (err) {
+            console.error('音频播放初始化失败:', err);
+        }
+        
+        try {
+            initStickyNotes();
+            console.log('便签功能初始化成功');
+        } catch (err) {
+            console.error('便签初始化失败:', err);
+        }
+        
+        try {
+            initSmoothScrolling();
+            console.log('平滑滚动初始化成功');
+        } catch (err) {
+            console.error('平滑滚动初始化失败:', err);
+        }
+        
+        try {
+            initAnalytics();
+            console.log('分析功能初始化成功');
+        } catch (err) {
+            console.error('分析初始化失败:', err);
+        }
+        
+        console.log('所有功能初始化完成');
+        
+    } catch (err) {
+        console.error('初始化过程发生严重错误:', err);
+        // 创建一个可见的错误提示
+        const errorDiv = document.createElement('div');
+        errorDiv.style.position = 'fixed';
+        errorDiv.style.top = '20px';
+        errorDiv.style.left = '50%';
+        errorDiv.style.transform = 'translateX(-50%)';
+        errorDiv.style.backgroundColor = 'red';
+        errorDiv.style.color = 'white';
+        errorDiv.style.padding = '15px';
+        errorDiv.style.borderRadius = '5px';
+        errorDiv.style.zIndex = '9999';
+        errorDiv.textContent = '网站功能初始化遇到问题，请刷新页面重试。';
+        document.body.appendChild(errorDiv);
+    }
+}
+
+// 确保在DOM完全加载后初始化
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', safeInit);
+} else {
+    // DOM已经加载完成，直接执行
+    safeInit();
+}
