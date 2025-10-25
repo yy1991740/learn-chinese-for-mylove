@@ -35,6 +35,17 @@ dist-ssr
 .env.development.local
 .env.test.local
 .env.production.local
+*.env
+
+# API keys and secrets
+api-keys.json
+keys.json
+*.key
+*.pem
+
+# Local API configuration
+api/config.js
+api/local-settings.js
 
 # Testing
 coverage
