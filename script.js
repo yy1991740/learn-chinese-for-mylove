@@ -5,19 +5,22 @@ let isChinese = true; // Tracks current language
 let currentEditingId = null;
 let currentEditingType = null;
 
-// Translation API configuration (for GitHub Pages deployment)
+// Translation API configuration
 const API_CONFIG = {
-    BACKEND_API_URL: '', // 禁用本地后端API
-    USE_BACKEND_API: false, // 强制禁用后端API，使用前端翻译方案
-    VOLC_ACCESS_KEY: localStorage.getItem('VOLC_ACCESS_KEY') || ''
+    BACKEND_API_URL: localStorage.getItem('BACKEND_API_URL') || 'http://localhost:3000',
+    USE_BACKEND_API: localStorage.getItem('USE_BACKEND_API') === 'true' || false,
+    VOLC_ACCESS_KEY: localStorage.getItem('VOLC_ACCESS_KEY') || '',
+    VOLC_ENDPOINT_ID: localStorage.getItem('VOLC_ENDPOINT_ID') || ''
 };
 
-// 注意：在GitHub Pages部署环境中，我们不使用本地后端API
-
-// 添加一个简单的函数用于设置火山方舟API密钥
-function setVolcApiKey(apiKey) {
+// 添加一个简单的函数用于设置火山方舟API密钥和端点ID
+function setVolcApiKey(apiKey, endpointId = '') {
     API_CONFIG.VOLC_ACCESS_KEY = apiKey;
+    API_CONFIG.VOLC_ENDPOINT_ID = endpointId;
     localStorage.setItem('VOLC_ACCESS_KEY', apiKey);
+    if (endpointId) {
+        localStorage.setItem('VOLC_ENDPOINT_ID', endpointId);
+    }
     console.log('火山方舟API密钥已设置，现在可以使用在线翻译功能');
     return true;
 }
@@ -38,20 +41,34 @@ function setApiKeys(accessKey) {
     return true;
 }
 
-// 注意：在GitHub Pages部署环境中，我们主要依赖前端翻译方案
-// 移除硬编码的API密钥，使用用户可选配置
-
 // 输出配置信息
 if (API_CONFIG.VOLC_ACCESS_KEY) {
-    console.log('已配置火山方舟API密钥，可以尝试使用在线翻译功能');
+    console.log('已配置火山方舟API密钥，可以使用在线翻译功能');
+    console.log('检查API配置结果:', checkApiConfig());
+    
+    // 页面加载时测试翻译功能（仅在开发模式下）
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        setTimeout(async () => {
+            console.log('===== 开始测试翻译功能 =====');
+            try {
+                const testText = 'halo';
+                console.log('测试翻译文本:', testText);
+                const result = await translateWithDoubao(testText, 'id', 'zh');
+                console.log('翻译测试结果:', result);
+            } catch (error) {
+                console.error('翻译测试失败:', error);
+            }
+        }, 2000);
+    }
 } else {
-    console.log('未配置火山方舟API密钥，将使用本地词典和前端翻译服务作为备用');
-    console.log('提示：在GitHub Pages环境中，出于安全考虑，建议不要在浏览器控制台设置API密钥');
-    console.log('系统将优先使用LibreTranslate和MyMemory等前端可访问的翻译服务');
+    console.log('未配置火山方舟API密钥，翻译功能将不可用');
+    console.log('配置步骤：');
+    console.log('1. 登录火山方舟控制台');
+    console.log('2. 进入"密钥管理"页面');
+    console.log('3. 创建并复制ARK_API_KEY和Endpoint ID');
+    console.log('4. 在浏览器控制台粘贴: setVolcApiKey("你的API密钥", "你的Endpoint ID")');
+    console.log('注意：请勿在公开场合分享您的API密钥！');
 }
-
-// 在GitHub Pages环境中初始化时不测试API连接，避免CORS和其他网络问题
-console.log('GitHub Pages模式已启用，使用前端翻译方案...');
 
 // Translation cache for faster responses
 const translationCache = new Map();
@@ -359,8 +376,33 @@ function isStandardDictionaryEntry(note) {
     return !note.querySelector('.edit-btn') && !note.querySelector('.delete-btn');
 }
 
-// 初始化逻辑已移至safeInit函数中
-// 避免重复初始化导致的功能冲突
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Load extended dictionary if it's available (from extendedDictionary.js)
+    if (window.extendedIndoToChineseDict) {
+        extendedIndoToChineseDict = window.extendedIndoToChineseDict;
+        mergeExtendedDictionary();
+    }
+    
+    // Load user translations from localStorage
+    loadUserTranslations();
+    
+    // Initialize all functionality
+    initMobileMenu();
+    initLanguageSwitch();
+    initAudioPlayback();
+    initModals();
+    initSmoothScrolling();
+    initStickyNotes();
+    initAnalytics();
+    addEditButtonsToExistingNotes();
+    
+    // Restore user-added visual elements (sticky notes)
+    restoreUserAddedVisualElements();
+    
+    // Add event listeners for page unload to save visual elements
+    window.addEventListener('beforeunload', saveUserAddedVisualElements);
+});
 
 // Mobile Menu Functionality
 function initMobileMenu() {
@@ -925,13 +967,16 @@ async function translateWithDoubao(text, sourceLang = null, targetLang = null, s
             ]
         };
 
-        // 设置认证头，按照用户指南使用Bearer Token方式，并添加用户提供的Access Key和Endpoint ID
+        // 设置认证头，仅使用用户提供的Bearer Token
         const headers = {
             'Authorization': `Bearer ${API_CONFIG.VOLC_ACCESS_KEY}`,
-            'Content-Type': 'application/json',
-            'X-Volc-AK': 'AKLTYjVmY2IzNDIyM2U5NDk2YThjOGUyNmY0NGNjYzZhYTg',
-            'X-Volc-Endpoint-ID': 'ep-20251025212759-bfkl9'
+            'Content-Type': 'application/json'
         };
+        
+        // 可选地添加Endpoint ID（如果用户提供了）
+        if (API_CONFIG.VOLC_ENDPOINT_ID) {
+            headers['X-Volc-Endpoint-ID'] = API_CONFIG.VOLC_ENDPOINT_ID;
+        }
 
         // 使用正确的火山方舟API端点
         const apiUrl = 'https://ark.cn-beijing.volces.com/api/v3/responses';
@@ -999,29 +1044,58 @@ async function translateWithDoubao(text, sourceLang = null, targetLang = null, s
         
     } catch (error) {
         console.error('火山方舟翻译失败:', error.message);
-        // 直接抛出错误，不再使用本地词典作为备用
-        throw error;
+        // 提供更友好的错误信息，不直接抛出错误
+        const userFriendlyError = {
+            message: '翻译服务暂时不可用，请检查API配置或稍后再试',
+            originalError: error.message
+        };
+        throw userFriendlyError;
     }
 }
 
 // Main translation function
 async function translateText(text, sourceLang = null, targetLang = null, skipCache = false) {
+    // 检查是否有缓存且不跳过缓存
+    const detectedSourceLang = sourceLang || detectLanguage(text);
+    const detectedTargetLang = targetLang || (detectedSourceLang === 'zh' ? 'id' : 'zh');
+    const cacheKey = `${text}_${detectedSourceLang}_${detectedTargetLang}`;
+    
+    if (!skipCache && translationCache.has(cacheKey)) {
+        const cachedTranslation = translationCache.get(cacheKey);
+        const pinyin = detectedTargetLang === 'zh' ? generatePinyin(cachedTranslation) : '';
+        return { 
+            chinese: detectedTargetLang === 'zh' ? cachedTranslation : text, 
+            pinyin: pinyin, 
+            translation: cachedTranslation 
+        };
+    }
+    
+    // 如果没有API密钥，直接返回空结果
+    if (!API_CONFIG.VOLC_ACCESS_KEY) {
+        showNotification(isChinese ? '请先配置翻译API密钥。' : 'Silakan konfigurasikan kunci API terjemahan terlebih dahulu.');
+        return { chinese: '', pinyin: '', translation: '' };
+    }
+    
     try {
-        const translation = await translateWithDoubao(text, sourceLang, targetLang, skipCache);
+        const translation = await translateWithDoubao(text, detectedSourceLang, detectedTargetLang, true); // 强制跳过缓存以确保直接调用API
         
         // Generate pinyin if translating to Chinese
-        const detectedSourceLang = sourceLang || detectLanguage(text);
-        const detectedTargetLang = targetLang || (detectedSourceLang === 'zh' ? 'id' : 'zh');
-        
         let pinyin = '';
         if (detectedTargetLang === 'zh') {
             pinyin = generatePinyin(translation);
         }
         
-        return { chinese: detectedTargetLang === 'zh' ? translation : text, pinyin: pinyin, translation: translation };
+        // 缓存结果
+        translationCache.set(cacheKey, translation);
+        
+        return { 
+            chinese: detectedTargetLang === 'zh' ? translation : text, 
+            pinyin: pinyin, 
+            translation: translation 
+        };
     } catch (error) {
         console.error('Translation failed:', error);
-        showNotification(isChinese ? '翻译失败，请检查API配置。' : 'Terjemahan gagal, periksa konfigurasi API.');
+        showNotification(isChinese ? '翻译失败: ' + error.message : 'Terjemahan gagal: ' + error.message);
         return { chinese: '', pinyin: '', translation: '' };
     }
 }
@@ -1973,25 +2047,6 @@ function safeInit() {
     console.log('开始初始化网站功能...');
     
     try {
-        // 加载扩展词典
-        try {
-            if (window.extendedIndoToChineseDict) {
-                extendedIndoToChineseDict = window.extendedIndoToChineseDict;
-                mergeExtendedDictionary();
-                console.log('扩展词典加载成功');
-            }
-        } catch (err) {
-            console.error('扩展词典加载失败:', err);
-        }
-        
-        // 加载用户翻译
-        try {
-            loadUserTranslations();
-            console.log('用户翻译加载成功');
-        } catch (err) {
-            console.error('用户翻译加载失败:', err);
-        }
-        
         // 检查DOM元素是否存在
         const addMoreWordsBtn = document.getElementById('addMoreWords');
         const addMoreSentencesBtn = document.getElementById('addMoreSentences');
@@ -1999,20 +2054,6 @@ function safeInit() {
         console.log('按钮元素检查:', { addMoreWordsBtn: !!addMoreWordsBtn, addMoreSentencesBtn: !!addMoreSentencesBtn });
         
         // 初始化各个功能模块
-        try {
-            initMobileMenu();
-            console.log('移动端菜单初始化成功');
-        } catch (err) {
-            console.error('移动端菜单初始化失败:', err);
-        }
-        
-        try {
-            initLanguageSwitch();
-            console.log('语言切换功能初始化成功');
-        } catch (err) {
-            console.error('语言切换初始化失败:', err);
-        }
-        
         try {
             initModals();
             console.log('模态框功能初始化成功');
@@ -2046,28 +2087,6 @@ function safeInit() {
             console.log('分析功能初始化成功');
         } catch (err) {
             console.error('分析初始化失败:', err);
-        }
-        
-        try {
-            addEditButtonsToExistingNotes();
-            console.log('添加编辑按钮成功');
-        } catch (err) {
-            console.error('添加编辑按钮失败:', err);
-        }
-        
-        try {
-            restoreUserAddedVisualElements();
-            console.log('恢复用户视觉元素成功');
-        } catch (err) {
-            console.error('恢复用户视觉元素失败:', err);
-        }
-        
-        // 添加卸载事件监听器
-        try {
-            window.addEventListener('beforeunload', saveUserAddedVisualElements);
-            console.log('卸载事件监听器添加成功');
-        } catch (err) {
-            console.error('添加卸载事件监听器失败:', err);
         }
         
         console.log('所有功能初始化完成');
