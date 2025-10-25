@@ -359,33 +359,8 @@ function isStandardDictionaryEntry(note) {
     return !note.querySelector('.edit-btn') && !note.querySelector('.delete-btn');
 }
 
-// Wait for DOM to be fully loaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Load extended dictionary if it's available (from extendedDictionary.js)
-    if (window.extendedIndoToChineseDict) {
-        extendedIndoToChineseDict = window.extendedIndoToChineseDict;
-        mergeExtendedDictionary();
-    }
-    
-    // Load user translations from localStorage
-    loadUserTranslations();
-    
-    // Initialize all functionality
-    initMobileMenu();
-    initLanguageSwitch();
-    initAudioPlayback();
-    initModals();
-    initSmoothScrolling();
-    initStickyNotes();
-    initAnalytics();
-    addEditButtonsToExistingNotes();
-    
-    // Restore user-added visual elements (sticky notes)
-    restoreUserAddedVisualElements();
-    
-    // Add event listeners for page unload to save visual elements
-    window.addEventListener('beforeunload', saveUserAddedVisualElements);
-});
+// 初始化逻辑已移至safeInit函数中
+// 避免重复初始化导致的功能冲突
 
 // Mobile Menu Functionality
 function initMobileMenu() {
@@ -1998,6 +1973,25 @@ function safeInit() {
     console.log('开始初始化网站功能...');
     
     try {
+        // 加载扩展词典
+        try {
+            if (window.extendedIndoToChineseDict) {
+                extendedIndoToChineseDict = window.extendedIndoToChineseDict;
+                mergeExtendedDictionary();
+                console.log('扩展词典加载成功');
+            }
+        } catch (err) {
+            console.error('扩展词典加载失败:', err);
+        }
+        
+        // 加载用户翻译
+        try {
+            loadUserTranslations();
+            console.log('用户翻译加载成功');
+        } catch (err) {
+            console.error('用户翻译加载失败:', err);
+        }
+        
         // 检查DOM元素是否存在
         const addMoreWordsBtn = document.getElementById('addMoreWords');
         const addMoreSentencesBtn = document.getElementById('addMoreSentences');
@@ -2005,6 +1999,20 @@ function safeInit() {
         console.log('按钮元素检查:', { addMoreWordsBtn: !!addMoreWordsBtn, addMoreSentencesBtn: !!addMoreSentencesBtn });
         
         // 初始化各个功能模块
+        try {
+            initMobileMenu();
+            console.log('移动端菜单初始化成功');
+        } catch (err) {
+            console.error('移动端菜单初始化失败:', err);
+        }
+        
+        try {
+            initLanguageSwitch();
+            console.log('语言切换功能初始化成功');
+        } catch (err) {
+            console.error('语言切换初始化失败:', err);
+        }
+        
         try {
             initModals();
             console.log('模态框功能初始化成功');
@@ -2038,6 +2046,28 @@ function safeInit() {
             console.log('分析功能初始化成功');
         } catch (err) {
             console.error('分析初始化失败:', err);
+        }
+        
+        try {
+            addEditButtonsToExistingNotes();
+            console.log('添加编辑按钮成功');
+        } catch (err) {
+            console.error('添加编辑按钮失败:', err);
+        }
+        
+        try {
+            restoreUserAddedVisualElements();
+            console.log('恢复用户视觉元素成功');
+        } catch (err) {
+            console.error('恢复用户视觉元素失败:', err);
+        }
+        
+        // 添加卸载事件监听器
+        try {
+            window.addEventListener('beforeunload', saveUserAddedVisualElements);
+            console.log('卸载事件监听器添加成功');
+        } catch (err) {
+            console.error('添加卸载事件监听器失败:', err);
         }
         
         console.log('所有功能初始化完成');
