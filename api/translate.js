@@ -4,11 +4,17 @@ const https = require('https');
 const crypto = require('crypto');
 const url = require('url');
 
-// 从环境变量读取配置
-const VOLC_ACCESS_KEY = process.env.VOLC_ACCESS_KEY || 'AKLTYjVmY2IzNDIyM2U5NDk2YThjOGUyNmY0NGNjYzZhYTg';
-const VOLC_SECRET_KEY = process.env.VOLC_SECRET_KEY || 'TW1KbVpXWTFNekV6TmpZeU5HTmhZamsyTVRBM1l6azRaVEUyTldOa1lqQQ==';
-const MODEL_ENDPOINT = 'ep-20251025212759-bfkl9';
-const MODEL_ID = 'Doubao-Seed-Translation';
+// 从环境变量读取配置 - 不包含硬编码密钥
+const VOLC_ACCESS_KEY = process.env.VOLC_ACCESS_KEY;
+const VOLC_SECRET_KEY = process.env.VOLC_SECRET_KEY;
+const MODEL_ENDPOINT = process.env.MODEL_ENDPOINT || 'ep-20251025212759-bfkl9';
+const MODEL_ID = process.env.MODEL_ID || 'Doubao-Seed-Translation';
+
+// 检查必要的环境变量是否设置
+if (!VOLC_ACCESS_KEY || !VOLC_SECRET_KEY) {
+    console.error('错误: 缺少必要的环境变量 VOLC_ACCESS_KEY 或 VOLC_SECRET_KEY');
+    console.error('请在运行前设置这些环境变量');
+}
 
 // 创建HTTP服务器
 const server = http.createServer((req, res) => {
