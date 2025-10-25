@@ -47,6 +47,10 @@ keys.json
 api/config.js
 api/local-settings.js
 
+# Exclude entire API directory to prevent exposing API keys
+api/
+api/*
+
 # Testing
 coverage
 *.lcov
