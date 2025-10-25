@@ -556,36 +556,58 @@ function initLanguageSwitch() {
     }
 }
 
-// Audio Playback Functionality
+// Audio Playback Functionality - Using event delegation for better performance and dynamic content support
 function initAudioPlayback() {
-    const audioButtons = document.querySelectorAll('.audio-btn');
-    
-    audioButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
+    // Use event delegation on the document body to handle all audio-btn clicks
+    // This ensures even dynamically added elements will work properly
+    document.body.addEventListener('click', (e) => {
+        // Check if the clicked element is an audio button or inside one
+        const button = e.target.closest('.audio-btn');
+        
+        if (button) {
             e.preventDefault();
             e.stopPropagation(); // Prevent triggering the sticky note click
             
             // Get the Chinese text from the sticky note
-            // Now supports both .word-sticky, .sentence-sticky, and .sticky-note classes
-            let parent = button.closest('.word-sticky');
-            if (!parent) parent = button.closest('.sentence-sticky');
-            if (!parent) parent = button.closest('.sticky-note');
+            // Support for different sticky note class variations
+            const parent = button.closest('.sticky-note, .word-sticky, .sentence-sticky');
             
             if (parent) {
-                const chineseText = parent.querySelector('h3').textContent;
+                const chineseText = parent.querySelector('h3')?.textContent || '';
                 
-                // Visual feedback that audio is playing
-                button.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-                
-                // Use Web Speech API for text-to-speech
-                speakText(chineseText, 'zh-CN');
-                
-                // Reset button icon after audio finishes
-                setTimeout(() => {
-                    button.innerHTML = '<i class="fa fa-volume-up"></i>';
-                }, 1500);
+                if (chineseText) {
+                    // Visual feedback that audio is playing
+                    button.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+                    
+                    // Use Web Speech API for text-to-speech
+                    speakText(chineseText, 'zh-CN');
+                    
+                    // Reset button icon after audio finishes
+                    setTimeout(() => {
+                        button.innerHTML = '<i class="fa fa-volume-up"></i>';
+                    }, 1500);
+                }
             }
-        });
+        }
+    });
+    
+    // Also handle delete button clicks using event delegation
+    document.body.addEventListener('click', (e) => {
+        // Check if the clicked element is a delete button
+        const deleteButton = e.target.closest('.delete-btn');
+        
+        if (deleteButton) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Get the parent sticky note
+            const noteElement = deleteButton.closest('.sticky-note');
+            if (noteElement && noteElement.id) {
+                // Determine if it's a word or sentence note based on ID
+                const noteType = noteElement.id.includes('word') ? 'word' : 'sentence';
+                deleteStickyNote(noteElement.id, noteType);
+            }
+        }
     });
 }
 
@@ -1775,25 +1797,11 @@ function addNewWord(chineseWord, pinyin, indonesian) {
         </div>
     `;
     
-    // Add event listener to the new audio button
-    const audioButton = newWordElement.querySelector('.audio-btn');
-    audioButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        speakText(chineseWord, 'zh-CN');
-        audioButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-        setTimeout(() => {
-            audioButton.innerHTML = '<i class="fa fa-volume-up"></i>';
-        }, 1500);
-    });
-    
-    // Add event listener to the delete button
-    const deleteButton = newWordElement.querySelector('.delete-btn');
-    deleteButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        deleteStickyNote(uniqueId, 'word');
-    });
+    // 事件监听器已通过事件委托方式在initAudioPlayback函数中处理，无需在此重复添加
+    // 为新添加的便签应用动画效果
+    if (window.applyNoteAnimation) {
+        window.applyNoteAnimation(newWordElement);
+    }
     
     // Add the new word to the grid
     wordsGrid.appendChild(newWordElement);
@@ -1877,25 +1885,11 @@ function addNewSentence(chineseSentence, pinyin, indonesian) {
         </div>
     `;
     
-    // Add event listener to the new audio button
-    const audioButton = newSentenceElement.querySelector('.audio-btn');
-    audioButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        speakText(chineseSentence, 'zh-CN');
-        audioButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-        setTimeout(() => {
-            audioButton.innerHTML = '<i class="fa fa-volume-up"></i>';
-        }, 1500);
-    });
-    
-    // Add event listener to the delete button
-    const deleteButton = newSentenceElement.querySelector('.delete-btn');
-    deleteButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        deleteStickyNote(uniqueId, 'sentence');
-    });
+    // 事件监听器已通过事件委托方式在initAudioPlayback函数中处理，无需在此重复添加
+    // 为新添加的便签应用动画效果
+    if (window.applyNoteAnimation) {
+        window.applyNoteAnimation(newSentenceElement);
+    }
     
     // Add the new sentence to the grid
     sentencesGrid.appendChild(newSentenceElement);
@@ -1973,25 +1967,40 @@ function initSmoothScrolling() {
     });
 }
 
-// Sticky Notes Animation Effects
+// Sticky Notes Animation Effects - Using event delegation for hover effects and animation
 function initStickyNotes() {
-    const stickyNotes = document.querySelectorAll('.sticky-note');
-    
-    stickyNotes.forEach((note, index) => {
-        // Apply staggered animation delay
+    // Apply staggered animation delay to existing sticky notes
+    const existingNotes = document.querySelectorAll('.sticky-note');
+    existingNotes.forEach((note, index) => {
         note.style.animationDelay = `${index * 0.1}s`;
-        
-        // Add hover effect with random rotation
-        note.addEventListener('mouseenter', () => {
+    });
+    
+    // Use event delegation for hover effects on all sticky notes (including dynamically added ones)
+    document.body.addEventListener('mouseenter', (e) => {
+        const note = e.target.closest('.sticky-note');
+        if (note) {
             const randomRotation = (Math.random() * 2 - 1).toFixed(1);
             note.style.transform = `rotate(${randomRotation}deg) scale(1.03)`;
-        });
-        
-        note.addEventListener('mouseleave', () => {
-            const originalRotation = note.style.getPropertyValue('--rotation');
-            note.style.transform = `rotate(${originalRotation}) scale(1)`;
-        });
+        }
     });
+    
+    document.body.addEventListener('mouseleave', (e) => {
+        const note = e.target.closest('.sticky-note');
+        if (note) {
+            const originalRotation = note.style.getPropertyValue('--rotation') || '0deg';
+            note.style.transform = `rotate(${originalRotation}) scale(1)`;
+        }
+    });
+    
+    // Helper function to apply animations to newly added sticky notes
+    window.applyNoteAnimation = function(noteElement) {
+        // Set initial animation with a slight delay
+        noteElement.style.animationDelay = '0.2s';
+        // Ensure the CSS animation plays
+        noteElement.style.animationName = 'fadeInUp';
+        // Force reflow to reset animation
+        noteElement.offsetHeight;
+    };
 }
 
 // Notification System
