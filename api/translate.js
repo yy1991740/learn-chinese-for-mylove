@@ -4,16 +4,19 @@ const https = require('https');
 const crypto = require('crypto');
 const url = require('url');
 
-// 从环境变量读取配置 - 不包含硬编码密钥
+// 从环境变量读取配置
 const VOLC_ACCESS_KEY = process.env.VOLC_ACCESS_KEY;
 const VOLC_SECRET_KEY = process.env.VOLC_SECRET_KEY;
 const MODEL_ENDPOINT = process.env.MODEL_ENDPOINT || 'ep-20251025212759-bfkl9';
 const MODEL_ID = process.env.MODEL_ID || 'Doubao-Seed-Translation';
 
-// 检查必要的环境变量是否设置
-if (!VOLC_ACCESS_KEY || !VOLC_SECRET_KEY) {
-    console.error('错误: 缺少必要的环境变量 VOLC_ACCESS_KEY 或 VOLC_SECRET_KEY');
-    console.error('请在运行前设置这些环境变量');
+// 验证必要的环境变量是否存在
+function validateEnvironment() {
+    if (!VOLC_ACCESS_KEY || !VOLC_SECRET_KEY) {
+        console.error('警告: VOLC_ACCESS_KEY 和 VOLC_SECRET_KEY 环境变量未设置');
+        return false;
+    }
+    return true;
 }
 
 // 创建HTTP服务器
@@ -104,6 +107,10 @@ function generateVolcSign(accessKey, secretKey, method, uri, headers, query, bod
 
 // 调用火山方舟API
 async function callVolcApi(text, sourceLang = 'zh', targetLang = 'id') {
+    // 检查环境变量配置
+    if (!validateEnvironment()) {
+        throw new Error('API配置不完整，请设置VOLC_ACCESS_KEY和VOLC_SECRET_KEY环境变量');
+    }
     // 确保sourceLang和targetLang是有效的
     const validLangs = ['zh', 'id'];
     if (!validLangs.includes(sourceLang) || !validLangs.includes(targetLang)) {
@@ -184,6 +191,9 @@ async function callVolcApi(text, sourceLang = 'zh', targetLang = 'id') {
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`Translation API server running on port ${PORT}`);
+    if (!validateEnvironment()) {
+        console.log('注意: 请设置必要的环境变量以使用翻译功能');
+    }
 });
 
 // 导出函数以便测试
