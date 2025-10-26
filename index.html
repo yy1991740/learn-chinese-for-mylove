@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 为GitHub Pages部署添加base标签 -->
+    <base href="/learn-chinese-for-mylove/">
+    <title>Learn Chinese for My Indonesian Girlfriend | 为我的印尼女友设计的中文学习网站</title>
+    <meta name="description" content="A fun and interactive Chinese learning website with pink cartoon theme, bilingual support (Chinese-Indonesian), and optimized audio features designed specifically for my Indonesian girlfriend.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF69B4',
+                        secondary: '#FFB6C1',
+                        accent: '#FF1493',
+                        light: '#FFF0F5',
+                        dark: '#8B008B'
+                    },
+                    fontFamily: {
+                        bubblegum: ['Bubblegum Sans', 'cursive'],
+                        chinese: ['Ma Shan Zheng', 'cursive']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            .sticky-note {
+                transform: rotate(var(--rotation));
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            .sticky-note:hover {
+                transform: rotate(var(--rotation)) scale(1.05);
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            }
+            .audio-btn {
+                transition: transform 0.2s ease;
+            }
+            .audio-btn:hover {
+                transform: scale(1.1);
+            }
+            .audio-btn:active {
+                transform: scale(0.95);
+            }
+            .nav-item {
+                position: relative;
+            }
+            .nav-item::after {
+                content: '';
+                position: absolute;
+                width: 0;
+                height: 2px;
+                bottom: -2px;
+                left: 0;
+                background-color: #FF1493;
+                transition: width 0.3s ease;
+            }
+            .nav-item:hover::after {
+                width: 100%;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gradient-to-b from-pink-50 to-pink-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <div class="container mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center mb-3 md:mb-0">
+                <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center mr-3">
+                    <i class="fa fa-heart text-white text-2xl"></i>
+                </div>
+                <h1 class="text-2xl md:text-3xl font-bubblegum text-primary text-shadow">
+                    Learning Chinese with Love
+                </h1>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <!-- Language Switcher -->
+                <div class="relative">
+                    <button id="languageSwitch" class="flex items-center space-x-1 px-3 py-1.5 bg-secondary rounded-full text-dark font-medium">
+                        <i class="fa fa-globe"></i>
+                        <span id="currentLanguage">中文 / Bahasa</span>
+                        <i class="fa fa-chevron-down text-xs"></i>
+                    </button>
+                </div>
+                
+                <!-- Navigation -->
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#words" class="nav-item text-dark font-medium hover:text-accent transition-colors">Words</a>
+                    <a href="#sentences" class="nav-item text-dark font-medium hover:text-accent transition-colors">Sentences</a>
+                    <a href="#about" class="nav-item text-dark font-medium hover:text-accent transition-colors">About</a>
+                </nav>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobileMenuBtn" class="md:hidden text-dark text-xl">
+                    <i class="fa fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-pink-100">
+            <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+                <a href="#words" class="text-dark font-medium hover:text-accent transition-colors py-1">Words</a>
+                <a href="#sentences" class="text-dark font-medium hover:text-accent transition-colors py-1">Sentences</a>
+                <a href="#about" class="text-dark font-medium hover:text-accent transition-colors py-1">About</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden">
+        <div class="absolute inset-0 bg-[url('https://picsum.photos/1200/600')] bg-cover bg-center opacity-20"></div>
+        <div class="container mx-auto px-4 py-16 md:py-24 relative z-10">
+            <div class="max-w-2xl mx-auto text-center">
+                <h2 class="text-[clamp(2.5rem,5vw,4rem)] font-chinese text-dark mb-4">爱 的 中 文 课</h2>
+                <p class="text-[clamp(1.2rem,2vw,1.5rem)] font-bubblegum text-dark mb-8">Pelajaran Cina dengan Cinta</p>
+                <p class="text-lg text-dark/80 mb-8">专为印尼朋友设计的中文学习网站，让学习中文变得简单有趣！</p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="#words" class="bg-primary hover:bg-accent text-white font-bold py-3 px-8 rounded-full transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <i class="fa fa-book mr-2"></i> 开始学习
+                    </a>
+                    <a href="#about" class="bg-white/80 hover:bg-white text-primary border-2 border-primary font-bold py-3 px-8 rounded-full transition-all transform hover:scale-105 shadow-md hover:shadow-lg">
+                        <i class="fa fa-info-circle mr-2"></i> 了解更多
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Words Section -->
+    <section id="words" class="py-16 bg-white/50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bubblegum text-primary mb-3">Essential Chinese Words</h2>
+                <p class="text-xl font-chinese text-dark">基础中文词语</p>
+                <div class="w-24 h-1 bg-primary mx-auto mt-4 rounded-full"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                <!-- Word Sticky Notes -->
+                <div class="sticky-note bg-indigo-100 p-6 rounded-lg" style="--rotation: 1deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">你好</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Nǐ hǎo</p>
+                    <p class="text-dark mb-4">Halo</p>
+                </div>
+                
+                <div class="sticky-note bg-purple-100 p-6 rounded-lg" style="--rotation: -1deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">谢谢</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Xiè xiè</p>
+                    <p class="text-dark mb-4">Terima kasih</p>
+                </div>
+                
+                <div class="sticky-note bg-blue-100 p-6 rounded-lg" style="--rotation: 1deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">再见</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Zài jiàn</p>
+                    <p class="text-dark mb-4">Selamat tinggal</p>
+                </div>
+                
+                <div class="sticky-note bg-red-100 p-6 rounded-lg" style="--rotation: -1deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">对不起</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Duì bù qǐ</p>
+                    <p class="text-dark mb-4">Maaf</p>
+                </div>
+                
+                <div class="sticky-note bg-pink-100 p-6 rounded-lg" style="--rotation: 1deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">我爱你</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Wǒ ài nǐ</p>
+                    <p class="text-dark mb-4">Aku mencintaimu</p>
+                </div>
+                
+                <div class="sticky-note bg-yellow-100 p-6 rounded-lg" style="--rotation: -1deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">请</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Qǐng</p>
+                    <p class="text-dark mb-4">Tolong/Silakan</p>
+                </div>
+                
+                <div class="sticky-note bg-purple-100 p-6 rounded-lg" style="--rotation: 2deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">宝贝</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Bǎo bèi</p>
+                    <p class="text-dark mb-4">Sayang</p>
+                </div>
+                
+                <div class="sticky-note bg-red-100 p-6 rounded-lg" style="--rotation: -2deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">亲爱的</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Qīn ài de</p>
+                    <p class="text-dark mb-4">Sayangku</p>
+                </div>
+                
+                <div class="sticky-note bg-indigo-100 p-6 rounded-lg" style="--rotation: 1deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">漂亮</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Piào liang</p>
+                    <p class="text-dark mb-4">Cantik</p>
+                </div>
+                
+                <div class="sticky-note bg-blue-100 p-6 rounded-lg" style="--rotation: -1deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">想你</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Xiǎng nǐ</p>
+                    <p class="text-dark mb-4">Rindu kamu</p>
+                </div>
+                
+                <!-- Additional love-related words -->
+                <div class="sticky-note bg-red-100 p-6 rounded-lg" style="--rotation: 0.5deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">心跳</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Xīn tiào</p>
+                    <p class="text-dark mb-4">Detak jantung</p>
+                </div>
+                
+                <div class="sticky-note bg-green-100 p-6 rounded-lg" style="--rotation: -0.5deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">喜欢</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Xǐ huān</p>
+                    <p class="text-dark mb-4">Suka</p>
+                </div>
+                
+                <div class="sticky-note bg-blue-100 p-6 rounded-lg" style="--rotation: 0.8deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">朋友</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Péng yǒu</p>
+                    <p class="text-dark mb-4">Teman</p>
+                </div>
+                
+                <div class="sticky-note bg-yellow-100 p-6 rounded-lg" style="--rotation: -1.2deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">谢谢</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Xiè xiè</p>
+                    <p class="text-dark mb-4">Terima kasih</p>
+                </div>
+                
+                <div class="sticky-note bg-red-100 p-6 rounded-lg" style="--rotation: 0.6deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">再见</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Zài jiàn</p>
+                    <p class="text-dark mb-4">Selamat tinggal</p>
+                </div>
+                
+                <div class="sticky-note bg-purple-100 p-6 rounded-lg" style="--rotation: -0.7deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">早上好</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Zǎo shang hǎo</p>
+                    <p class="text-dark mb-4">Selamat pagi</p>
+                </div>
+                
+                <div class="sticky-note bg-indigo-100 p-6 rounded-lg" style="--rotation: 1deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">晚上好</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Wǎn shang hǎo</p>
+                    <p class="text-dark mb-4">Selamat malam</p>
+                </div>
+                
+                <div class="sticky-note bg-pink-100 p-6 rounded-lg" style="--rotation: -0.9deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">对不起</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Duì bù qǐ</p>
+                    <p class="text-dark mb-4">Maaf</p>
+                </div>
+                
+                <div class="sticky-note bg-green-100 p-6 rounded-lg" style="--rotation: 0.5deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">没关系</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Méi guān xì</p>
+                    <p class="text-dark mb-4">Tidak apa-apa</p>
+                </div>
+                
+                <div class="sticky-note bg-blue-100 p-6 rounded-lg" style="--rotation: -0.8deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">请问</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Qǐng wèn</p>
+                    <p class="text-dark mb-4">Permisi/Bolehkah saya bertanya</p>
+                </div>
+            </div>
+            
+            <div class="text-center mt-10">
+                <button id="addMoreWords" class="bg-secondary hover:bg-primary text-white font-bold py-2 px-6 rounded-full transition-all transform hover:scale-105 shadow-md">
+                    <i class="fa fa-plus mr-2"></i> Add More Words
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sentences Section -->
+    <section id="sentences" class="py-16 bg-light">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bubblegum text-primary mb-3">Useful Chinese Sentences</h2>
+                <p class="text-xl font-chinese text-dark">实用中文句子</p>
+                <div class="w-24 h-1 bg-primary mx-auto mt-4 rounded-full"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <!-- Sentence Sticky Notes -->
+                  <div class="sticky-note bg-indigo-100 p-6 rounded-lg" style="--rotation: 1deg;">
+                     <div class="flex justify-between items-start mb-4">
+                         <h3 class="text-2xl font-chinese text-dark">你叫什么名字？</h3>
+                         <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                             <i class="fa fa-volume-up"></i>
+                         </button>
+                     </div>
+                     <p class="text-lg font-bubblegum text-dark mb-2">Nǐ jiào shén me míng zì?</p>
+                     <p class="text-dark">Siapa nama kamu?</p>
+                 </div>
+              
+                 <div class="sticky-note bg-purple-100 p-6 rounded-lg" style="--rotation: -1deg;">
+                     <div class="flex justify-between items-start mb-4">
+                         <h3 class="text-2xl font-chinese text-dark">你好吗？</h3>
+                         <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                             <i class="fa fa-volume-up"></i>
+                         </button>
+                     </div>
+                     <p class="text-lg font-bubblegum text-dark mb-2">Nǐ hǎo ma?</p>
+                     <p class="text-dark">Apa kabar kamu?</p>
+                 </div>
+              
+                 <div class="sticky-note bg-red-100 p-6 rounded-lg" style="--rotation: 2deg;">
+                     <div class="flex justify-between items-start mb-4">
+                         <h3 class="text-2xl font-chinese text-dark">我很想你</h3>
+                         <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                             <i class="fa fa-volume-up"></i>
+                         </button>
+                     </div>
+                     <p class="text-lg font-bubblegum text-dark mb-2">Wǒ hěn xiǎng nǐ</p>
+                     <p class="text-dark">Aku sangat merindukanmu</p>
+                 </div>
+              
+                 <div class="sticky-note bg-pink-100 p-6 rounded-lg" style="--rotation: -2deg;">
+                     <div class="flex justify-between items-start mb-4">
+                         <h3 class="text-2xl font-chinese text-dark">你很漂亮</h3>
+                         <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                             <i class="fa fa-volume-up"></i>
+                         </button>
+                     </div>
+                     <p class="text-lg font-bubblegum text-dark mb-2">Nǐ hěn piào liang</p>
+                     <p class="text-dark">Kamu sangat cantik</p>
+                 </div>
+              
+                 <div class="sticky-note bg-yellow-100 p-6 rounded-lg" style="--rotation: 1deg;">
+                     <div class="flex justify-between items-start mb-4">
+                         <h3 class="text-2xl font-chinese text-dark">我喜欢你的笑容</h3>
+                         <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                             <i class="fa fa-volume-up"></i>
+                         </button>
+                     </div>
+                     <p class="text-lg font-bubblegum text-dark mb-2">Wǒ xǐ huān nǐ de xiào róng</p>
+                     <p class="text-dark">Aku suka senyum kamu</p>
+                 </div>
+              
+                 <div class="sticky-note bg-green-100 p-6 rounded-lg" style="--rotation: -1deg;">
+                     <div class="flex justify-between items-start mb-4">
+                         <h3 class="text-2xl font-chinese text-dark">你今天过得怎么样？</h3>
+                         <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                             <i class="fa fa-volume-up"></i>
+                         </button>
+                     </div>
+                     <p class="text-lg font-bubblegum text-dark mb-2">Nǐ jīn tiān guò dé zěn me yàng?</p>
+                     <p class="text-dark">Bagaimana harimu hari ini?</p>
+                 </div>
+              
+                 <div class="sticky-note bg-blue-100 p-6 rounded-lg" style="--rotation: 0.5deg;">
+                     <div class="flex justify-between items-start mb-4">
+                         <h3 class="text-2xl font-chinese text-dark">我想和你一起吃饭</h3>
+                         <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                             <i class="fa fa-volume-up"></i>
+                         </button>
+                     </div>
+                     <p class="text-lg font-bubblegum text-dark mb-2">Wǒ xiǎng hé nǐ yì qǐ chī fàn</p>
+                     <p class="text-dark">Aku ingin makan denganmu</p>
+                 </div>
+              
+                 <div class="sticky-note bg-indigo-100 p-6 rounded-lg" style="--rotation: -0.5deg;">
+                     <div class="flex justify-between items-start mb-4">
+                         <h3 class="text-2xl font-chinese text-dark">遇见你是我的幸运</h3>
+                         <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                             <i class="fa fa-volume-up"></i>
+                         </button>
+                     </div>
+                     <p class="text-lg font-bubblegum text-dark mb-2">Yù jiàn nǐ shì wǒ de xìng yùn</p>
+                     <p class="text-dark">Menemui kamu adalah keberuntungan saya</p>
+                 </div>
+                
+                <div class="sticky-note bg-indigo-100 p-6 rounded-lg" style="--rotation: -1deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">我喜欢学习中文。</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Wǒ xǐ huān xué xí zhōng wén.</p>
+                    <p class="text-dark">Aku suka belajar bahasa Cina.</p>
+                </div>
+                
+                <div class="sticky-note bg-amber-100 p-6 rounded-lg" style="--rotation: 0.5deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">今天天气怎么样？</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Jīn tiān tiān qì zěn me yàng?</p>
+                    <p class="text-dark">Bagaimana cuaca hari ini?</p>
+                </div>
+                
+                <div class="sticky-note bg-indigo-100 p-6 rounded-lg" style="--rotation: 0.8deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">我很高兴认识你。</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Wǒ hěn gāo xìng rèn shí nǐ.</p>
+                    <p class="text-dark">Saya senang bertemu denganmu.</p>
+                </div>
+                
+                <div class="sticky-note bg-purple-100 p-6 rounded-lg" style="--rotation: -0.6deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">你来自哪里？</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Nǐ lái zì nǎ lǐ?</p>
+                    <p class="text-dark">Dari mana kamu?</p>
+                </div>
+                
+                <div class="sticky-note bg-red-100 p-6 rounded-lg" style="--rotation: 0.7deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">我是印尼人。</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Wǒ shì yìn ní rén.</p>
+                    <p class="text-dark">Saya orang Indonesia.</p>
+                </div>
+                
+                <div class="sticky-note bg-blue-100 p-6 rounded-lg" style="--rotation: -0.9deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">你会说印尼语吗？</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Nǐ huì shuō yìn ní yǔ ma?</p>
+                    <p class="text-dark">Bisakah kamu berbicara bahasa Indonesia?</p>
+                </div>
+                
+                <div class="sticky-note bg-green-100 p-6 rounded-lg" style="--rotation: 0.6deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">我正在学习中文。</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Wǒ zhèng zài xué xí zhōng wén.</p>
+                    <p class="text-dark">Saya sedang belajar bahasa Cina.</p>
+                </div>
+                
+                <div class="sticky-note bg-yellow-100 p-6 rounded-lg" style="--rotation: -0.5deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">你有男朋友吗？</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Nǐ yǒu nán péng yǒu ma?</p>
+                    <p class="text-dark">Apakah kamu punya pacar?</p>
+                </div>
+                
+                <div class="sticky-note bg-pink-100 p-6 rounded-lg" style="--rotation: 0.7deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">我喜欢你。</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Wǒ xǐ huān nǐ.</p>
+                    <p class="text-dark">Aku suka kamu.</p>
+                </div>
+                
+                <div class="sticky-note bg-indigo-100 p-6 rounded-lg" style="--rotation: -0.8deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">我们一起去吃饭吧。</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Wǒ men yì qǐ qù chī fàn ba.</p>
+                    <p class="text-dark">Mari kita makan bersama.</p>
+                </div>
+                
+                <div class="sticky-note bg-purple-100 p-6 rounded-lg" style="--rotation: 0.9deg;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-chinese text-dark">你多大了？</h3>
+                        <button class="audio-btn bg-primary/20 hover:bg-primary/30 text-primary p-2 rounded-full">
+                            <i class="fa fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <p class="text-lg font-bubblegum text-dark mb-2">Nǐ duō dà le?</p>
+                    <p class="text-dark">Berapa umur kamu?</p>
+                </div>
+            </div>
+            
+            <div class="text-center mt-10">
+                <button id="addMoreSentences" class="bg-secondary hover:bg-primary text-white font-bold py-2 px-6 rounded-full transition-all transform hover:scale-105 shadow-md">
+                    <i class="fa fa-plus mr-2"></i> Add More Sentences
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto text-center">
+                <h2 class="text-3xl md:text-4xl font-bubblegum text-primary mb-6">关于这个网站</h2>
+                <p class="text-dark/80 mb-6">这个网站是为我的印尼女友设计的，帮助她学习中文。网站采用粉色主题和卡通风格，让学习变得更加有趣和愉悦。</p>
+                <p class="text-dark/80 mb-8">网站包含基础中文词语和实用句子，每个词汇和句子都配有拼音、印尼语翻译和音频，方便学习发音。所有内容都以便利贴的形式展示，让学习体验更加轻松。</p>
+                
+                <div class="flex flex-wrap justify-center gap-4 mb-8">
+                    <div class="bg-light p-4 rounded-full">
+                        <i class="fa fa-language text-2xl text-primary"></i>
+                        <p class="mt-2 font-medium text-dark">双语切换</p>
+                    </div>
+                    <div class="bg-light p-4 rounded-full">
+                        <i class="fa fa-volume-up text-2xl text-primary"></i>
+                        <p class="mt-2 font-medium text-dark">音频发音</p>
+                    </div>
+                    <div class="bg-light p-4 rounded-full">
+                        <i class="fa fa-sticky-note-o text-2xl text-primary"></i>
+                        <p class="mt-2 font-medium text-dark">便利贴学习</p>
+                    </div>
+                    <div class="bg-light p-4 rounded-full">
+                        <i class="fa fa-heart text-2xl text-primary"></i>
+                        <p class="mt-2 font-medium text-dark">充满爱意</p>
+                    </div>
+                </div>
+                
+                <div class="bg-light p-6 rounded-lg">
+                    <h3 class="text-xl font-bubblegum text-primary mb-3">学习小贴士</h3>
+                    <ul class="text-left text-dark/80 space-y-2">
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                            <span>每天花15-30分钟学习，坚持比一次性学习很长时间更有效。</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                            <span>多听音频，模仿发音，不要害怕犯错。</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                            <span>尝试在日常生活中使用学到的词语和句子。</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                            <span>制作自己的闪卡，随时随地复习。</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-primary text-white py-10">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <h2 class="text-2xl font-bubblegum mb-2">Learning Chinese with Love</h2>
+                    <p class="opacity-80">用爱学习中文</p>
+                </div>
+                
+                <div class="flex space-x-4 mb-6 md:mb-0">
+                    <a href="#" class="bg-white/20 hover:bg-white/30 p-2 rounded-full transition-colors">
+                        <i class="fa fa-heart"></i>
+                    </a>
+                    <a href="#" class="bg-white/20 hover:bg-white/30 p-2 rounded-full transition-colors">
+                        <i class="fa fa-book"></i>
+                    </a>
+                    <a href="#" class="bg-white/20 hover:bg-white/30 p-2 rounded-full transition-colors">
+                        <i class="fa fa-music"></i>
+                    </a>
+                </div>
+                
+                <div class="text-center md:text-right">
+                    <p class="opacity-80">为我的印尼女友精心制作 ❤️</p>
+                    <p class="opacity-60 text-sm mt-1">© 2023 版权所有</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Audio Player (Hidden) -->
+    <audio id="audioPlayer" preload="auto"></audio>
+
+    <!-- Add New Word Modal -->
+    <div id="wordModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bubblegum text-primary">Add New Word</h3>
+                <button id="closeWordModal" class="text-dark hover:text-accent">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="wordForm">
+                <div class="mb-4">
+                    <label class="block text-dark font-medium mb-2">Chinese Word</label>
+                    <input type="text" id="chineseWord" class="w-full px-3 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-dark font-medium mb-2">Pinyin</label>
+                    <input type="text" id="wordPinyin" class="w-full px-3 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-dark font-medium mb-2">Indonesian Translation</label>
+                    <input type="text" id="indonesianWord" class="w-full px-3 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                    <p class="text-xs text-gray-500 input-hint">Please manually enter the Indonesian text, Chinese translation and Pinyin</p>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="cancelWordModal" class="px-4 py-2 border border-pink-200 rounded-lg text-dark hover:bg-pink-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-accent">Add Word</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add New Sentence Modal -->
+    <div id="sentenceModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bubblegum text-primary">Add New Sentence</h3>
+                <button id="closeSentenceModal" class="text-dark hover:text-accent">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="sentenceForm">
+                <div class="mb-4">
+                    <label class="block text-dark font-medium mb-2">Chinese Sentence</label>
+                    <input type="text" id="chineseSentence" class="w-full px-3 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-dark font-medium mb-2">Pinyin</label>
+                    <input type="text" id="sentencePinyin" class="w-full px-3 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-dark font-medium mb-2">Indonesian Translation</label>
+                    <input type="text" id="indonesianSentence" class="w-full px-3 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                    <p class="text-xs text-gray-500 modal-hint">Please manually enter the Indonesian text, Chinese translation and Pinyin</p>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="cancelSentenceModal" class="px-4 py-2 border border-pink-200 rounded-lg text-dark hover:bg-pink-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-accent">Add Sentence</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
